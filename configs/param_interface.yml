@@ -1,0 +1,8 @@
+interface: 'xe-2/0/0'
+description : 'router2'
+ipv4_address : '192.168.0.1'
+ipv4_subnet : '24'
+ipv6_address : '2001::1'
+ipv6_subnet : '64'
+ipv6_linklocal_address : 'fe80::1'
+ipv6_linklocal_subnet : '64'
