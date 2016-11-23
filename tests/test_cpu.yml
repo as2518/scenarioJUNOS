@@ -1,0 +1,8 @@
+test_cpu:
+  - command: show chassis routing-engine
+  - item:
+      xpath: '/route-engine-information/route-engine'
+      tests:
+        - is-gt: cpu-idle, 20
+          info: "Test : OK, CPU Idle : {{pre['cpu-idle']}} %" 
+          err:  "Test : NG, CPU Idle : {{pre['cpu-idle']}} %" 

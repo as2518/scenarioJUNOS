@@ -5,18 +5,18 @@ purpus:  |
 operator: Taiji Tsuchiya
 operation_date: 20161115
 hosts:
-  - device: 192.168.34.16 
-    hostname: firefly1
-    username: user1
-    password: pass1
+  device: 192.168.34.16
+  hostname: firefly1
+  username: user1
+  password: password1
 scenario:
+  - test_hostname
   - test_ping:
     - 8.8.8.8
     - 10.10.10.10
   - test_traceroute:
     - 8.8.8.8
     - 10.10.10.10
-  - show_clock
   - test_memory
   - test_cpu
   - test_bgp_neighbor_all

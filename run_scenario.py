@@ -6,16 +6,52 @@ from __future__ import print_function
 
 import sys
 import yaml
-from pprint import pprint 
+from pprint import pprint, pformat
 from argparse import ArgumentParser
 
-# for clolor font
+# timestamp
+from datetime import datetime
+
+# clolor font
 import colorama
 from colorama import Fore, Back, Style
 
-# for PyEZ
+# PyEZ
 from jnpr.junos import Device
 from jnpr.junos.utils.config import Config
+
+# JSNAPy
+from jnpr.jsnapy import SnapAdmin
+
+def run_test(device_connection, menue, param=None):
+    print('Run %s : ' % menue, end='')
+
+    jsnapy = SnapAdmin()
+    timestamp = datetime.now().strftime('%Y%m%d-%H%M')
+    snap_name = 'snap' + timestamp
+
+    # 知見: snapcheck関数でDeviceクラスを利用するときはhost部は不要 
+    #jsnapy_config = jsnapy_config_host +\
+    jsnapy_config =\
+        'tests:\n' +\
+        ' - ./tests/%s.yml' % (menue)
+    #print(jsnapy.snapcheck(data=jsnapy_config, file_name=snap_name, dev=dev1))
+    
+    snapcheck_list = jsnapy.snapcheck(
+                        data=jsnapy_config,
+                        file_name=snap_name,
+                        dev=device_connection)
+    
+    for snapcheck in snapcheck_list:
+        if snapcheck.result == 'Passed':
+            print(Fore.GREEN + 'OK')
+        elif snapcheck.result == 'Failed':
+            print(Fore.RED + 'NG')
+            #print(Fore.RED + dict(snapcheck.test_details))
+            print(Fore.RED, end='')
+            print(Fore.RED + pformat(dict(snapcheck.test_details)))
+        
+    
 
 
 def run_pyez(option, device):
@@ -48,69 +84,98 @@ def main():
     # Read router infomation file
     try:
         with open(args.file, 'r') as f:
-            scenario_param_yaml = f.read()
+            param_yaml = f.read()
     except (IOError, IndexError):
         sys.stderr.write('Cannot open file : ' + args.file + '\n')
         sys.exit(1)
 
     # Convert yaml format to python_type
     try:
-        scenario_param = yaml.load(scenario_param_yaml)
+        param = yaml.load(param_yaml)
     except ValueError as error:
         sys.stderr.write('YAML format error : \n')
-        sys.stderr.write(scenario_param_yaml)
+        sys.stderr.write(param_yaml)
         sys.stderr.write(str(error))
         sys.exit(1)
 
-    #pprint(scenario_param)
+    #pprint(param)
 
     print('########## Run Senario : ' + args.file + ' ##########')
 
-    print('operator : ' + scenario_param['operator'])
-    print('operation_date : ' + str(scenario_param['operation_date']))
-    
-    print('hostname : ', end='')
-    for host in scenario_param['hosts']:
-        print(host['hostname'])
-    
+    print('operator : ' + param['operator'])
+    print('operation_date : ' + str(param['operation_date']))
+    print('hostname : ' + param['hosts']['hostname'])
     print('purpose :')
-    print(scenario_param['purpus'])
-    
-    for key,value in scenario_param['operation_param'].items():
-        print(str(key) + ' : ' + str(value))
-    
+    print(param['purpus'])
+    #print(param['scenario'])
+
+    #print(param['scenario'][0])
+
     print('Operation Start : ', end='')
     print(Fore.GREEN + 'OK')
 
-
-
-if __name__ == '__main__':
-    main()
-    print(Fore.YELLOW + "Do you start to operation? y/n")
-    choice = raw_input().lower()
-    if choice != 'y':
-        print('This operation is aborted') 
-        sys.exit(0)
-
-    print('Connect to ' + scenario_param['hosts'][0]['hostname'] + ' : ', end='')
+    print('Connecting to ' + param['hosts']['hostname'] + ' : ', end='')
     dev1 = Device(
-            host = scenario_param['hosts'][0]['device'],
-            user = scenario_param['hosts'][0]['username'],
-            password = scenario_param['hosts'][0]['password'] )
+            host = param['hosts']['device'],
+            user = param['hosts']['username'],
+            password = param['hosts']['password'],
+            port = 22)
     dev1.open()
     dev1.bind(cu=Config)
     dev1.cu.lock()
     print(Fore.GREEN + 'OK')
 
+
+    
+
+    
+    # 知見: snapcheck関数でDeviceクラスを利用するときはhost部は不要
+    #jsnapy_config_host =\
+    #    'hosts:\n' +\
+    #    '- device: %s\n'    % (param['hosts']['device']) +\
+    #    '  username : %s\n' % (param['hosts']['username']) +\
+    #    '  passwd: %s\n'    % (param['hosts']['password'])
+    
+    
+
+    for menue in param['scenario']:
+        if 'test_' in menue:
+            if menue ==  'test_hostname':
+                run_test(device_connection=dev1, menue=menue)
+            elif menue == 'test_cpu':
+                run_test(device_connection=dev1, menue=menue)
+        elif 'set_' in menue:
+            pass
+        else:
+            pass
+            
+            
+
+
+        
+           
+            
+        #print(Fore.GREEN + 'OK')
+                
+                        
+    
     #print("hostname : %s" % ( dev1.facts['hostname']))
     #print("model : %s"    % ( dev1.facts['model']))
     #print("version: %s"   % ( dev1.facts['version']))
 
-    print(run_pyez(option='show_hostname', device = dev1))
-    print(run_pyez(option='show_model', device = dev1))
-    print(run_pyez(option='show_version', device = dev1))
+    #print(run_pyez(option='show_hostname', device = dev1))
+    #print(run_pyez(option='show_model', device = dev1))
+    #print(run_pyez(option='show_version', device = dev1))
 
 
+
+    print('Closing conection to ' + param['hosts']['hostname'] + ' : ', end='')
 
     dev1.cu.unlock()
     dev1.close()
+    print(Fore.GREEN + 'OK')
+    
+
+if __name__ == '__main__':
+    main()
+
