@@ -11,19 +11,14 @@ hosts:
   password: password1
 scenario:
   - test_hostname
-  - test_ping:
-    - 8.8.8.8
-    - 10.10.10.10
-  - test_traceroute:
-    - 8.8.8.8
-    - 10.10.10.10
-  - test_memory
-  - test_cpu
+  - test_model
   - test_bgp_neighbor_all
-  - test_interface_all
-  - test_interface_target
+  - test_interface:
+    - all
+    - ge-0/0/2
   - set_intarface:
-    if_name: xe-0/0/0
+    interface_name: ge-0/0/2
+    interface
     if_address_ipv4: 192.168.1.1
   - test_interface_all
   - test_interface_target

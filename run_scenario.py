@@ -23,10 +23,10 @@ from jnpr.junos.utils.config import Config
 # JSNAPy
 from jnpr.jsnapy import SnapAdmin
 
-def run_test(device_connection, menue, param=None):
+def run_test(device, jsnapy, menue, param=None):
     print('Run %s : ' % menue, end='')
 
-    jsnapy = SnapAdmin()
+    #jsnapy = SnapAdmin()
     timestamp = datetime.now().strftime('%Y%m%d-%H%M')
     snap_name = 'snap' + timestamp
 
@@ -40,9 +40,17 @@ def run_test(device_connection, menue, param=None):
     snapcheck_list = jsnapy.snapcheck(
                         data=jsnapy_config,
                         file_name=snap_name,
-                        dev=device_connection)
+                        dev=device)
     
+    pprint(snapcheck_list)
+    
+    print('start check')
     for snapcheck in snapcheck_list:
+        #pprint(dict(snapcheck.test_details))
+        #pprint(dict(snapcheck.log_detail))
+        pprint(snapcheck.logger_testop)
+        pprint(dict(snapcheck.result_dict))
+
         if snapcheck.result == 'Passed':
             print(Fore.GREEN + 'OK')
         elif snapcheck.result == 'Failed':
@@ -50,6 +58,9 @@ def run_test(device_connection, menue, param=None):
             #print(Fore.RED + dict(snapcheck.test_details))
             print(Fore.RED, end='')
             print(Fore.RED + pformat(dict(snapcheck.test_details)))
+        else:
+            print('else2')
+    print('finish check')
         
     
 
@@ -136,38 +147,25 @@ def main():
     #    '  username : %s\n' % (param['hosts']['username']) +\
     #    '  passwd: %s\n'    % (param['hosts']['password'])
     
-    
+    jsnapy = SnapAdmin()
 
     for menue in param['scenario']:
+        pprint(menue)
         if 'test_' in menue:
             if menue ==  'test_hostname':
-                run_test(device_connection=dev1, menue=menue)
+                run_test(device=dev1,jsnapy=jsnapy, menue=menue)
             elif menue == 'test_cpu':
-                run_test(device_connection=dev1, menue=menue)
+                run_test(device=dev1,jsnapy=jsnapy, menue=menue)
         elif 'set_' in menue:
-            pass
+            #pass
+            print(Fore.GREEN + 'set_')
         else:
             pass
-            
-            
-
-
-        
-           
-            
-        #print(Fore.GREEN + 'OK')
-                
-                        
+            print(Fore.GREEN + 'else')
     
-    #print("hostname : %s" % ( dev1.facts['hostname']))
-    #print("model : %s"    % ( dev1.facts['model']))
-    #print("version: %s"   % ( dev1.facts['version']))
-
-    #print(run_pyez(option='show_hostname', device = dev1))
-    #print(run_pyez(option='show_model', device = dev1))
-    #print(run_pyez(option='show_version', device = dev1))
-
-
+       
+            
+            
 
     print('Closing conection to ' + param['hosts']['hostname'] + ' : ', end='')
 
