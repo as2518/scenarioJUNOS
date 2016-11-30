@@ -25,3 +25,7 @@ scenario:
   - test_interface:
       interface_name: ge-0/0/2
       interface_status: up
+  - test_bgp_neighbor:
+      neighbor_address_ipv4: 192.168.35.2
+      neighbor_status: Established
+  

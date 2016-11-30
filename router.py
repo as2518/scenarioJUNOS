@@ -91,15 +91,18 @@ class Router:
             template_filename = './test_templates/test_model.jinja2'
             tamplate_param = { 'model' : self.model }
             test_filename =  './tests/test_model_' + self.hostname + '.yml'
-
-
         elif operation_name == 'test_interface':
             template_filename = './test_templates/test_interface.jinja2'
             tamplate_param = operation_param
             test_filename =  './tests/test_interface_' +\
                              operation_param['interface_name'].replace('/','-') + '_' +\
                              operation_param['interface_status'] + '.yml'
-
+        elif operation_name == 'test_bgp_neighbor':
+            template_filename = './test_templates/test_bgp_neighbor.jinja2'
+            tamplate_param = operation_param
+            test_filename =  './tests/test_bgp_neighbor_' +\
+                             operation_param['neighbor_address_ipv4'].replace('.','-') + '_' +\
+                             operation_param['neighbor_status'] + '.yml'                     
         else:
             pass
 
