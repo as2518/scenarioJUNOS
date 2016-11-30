@@ -4,3 +4,4 @@ test_hostname:
       xpath: /software-information
       tests:
         - is-equal: host-name, firefly1
+        - is-equal: host-name, firefly1

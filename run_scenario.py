@@ -62,6 +62,7 @@ def main():
     print('model : %s'          % (param['hosts']['model']) )
     print('purpose :')
     print(param['purpus'])
+
     
     print('Connect to ' + param['hosts']['hostname'] + ' : ', end='')
     router1.open()
@@ -71,16 +72,20 @@ def main():
     router1.lock()
     print(Fore.GREEN + 'OK')
 
-    for operation_param in param['scenario']:
-        if isinstance(operation_param , dict):
-            operation_name = operation_param.keys()[0]
+
+    for scenario_param in param['scenario']:
+        if isinstance(scenario_param , dict):
+            operation_name  = scenario_param.keys()[0]
+            operation_param = scenario_param[operation_name]
         else:
-            operation_name = operation_param 
+            operation_name = scenario_param
+            operation_param = None
           
         if "test_" in operation_name:
             print('Test on < %s > : '%(operation_name), end='')
 
-            result, message = router1.snaptest(operation_name)
+            result, message = router1.snaptest(operation_name, operation_param) 
+            
             if result : 
                 print(Fore.GREEN + 'OK')
                 print(Fore.GREEN + message)
@@ -90,7 +95,7 @@ def main():
 
         elif "set_" in operation_name:
             print('Load config on < %s > : '%(operation_name), end='')
-            result, message = router1.load_config(operation_param)
+            result, message = router1.load_config(operation_name, operation_param)
             if result : 
                 print(Fore.GREEN + 'OK')
                 print('-'*30)
@@ -102,13 +107,11 @@ def main():
                 print(Fore.RED + 'NG')
                 print(Fore.RED + message)
 
-
             print('Diff config :')
             message = router1.diff_config()
             print('-'*30)
             print(Fore.YELLOW + message)
             print('-'*30)
-
 
             print('Commit Check : ', end='')
             if router1.commit_check():
@@ -116,7 +119,6 @@ def main():
             else:
                 print(Fore.RED + 'NG')
 
-            
             print(Fore.YELLOW + "Do you commit? y/n")
             choice = raw_input().lower()
             if choice == 'y':

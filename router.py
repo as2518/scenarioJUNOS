@@ -47,18 +47,21 @@ class Router:
         return self.device.cu.rollback()
 
     def diff_config(self):
-        return self.device.cu.diff()
+        if self.device.cu.diff():
+            message = self.device.cu.diff()
+        else:
+            message = ''
+        return message
     
     def commit_check(self):
         return self.device.cu.commit_check()
         
-    def load_config(self, operation_param):
+    def load_config(self, operation_name, operation_param=None):
         set_result = False
         message = ''
-        operation_name = operation_param.keys()[0]
         if operation_name == 'set_add_interface':
             template_filename = './set_templates/add_interface.jinja2'
-            tamplate_param = operation_param[operation_name]
+            tamplate_param = operation_param
 
         config_txt = self.generate_from_jinja2(template_filename, tamplate_param)
         
@@ -75,7 +78,7 @@ class Router:
     
         
 
-    def snaptest(self, operation_name):
+    def snaptest(self, operation_name, operation_param=None):
         
         test_result = False
         message = ''
@@ -88,8 +91,20 @@ class Router:
             template_filename = './test_templates/test_model.jinja2'
             tamplate_param = { 'model' : self.model }
             test_filename =  './tests/test_model_' + self.hostname + '.yml'
+
+
+        elif operation_name == 'test_interface':
+            template_filename = './test_templates/test_interface.jinja2'
+            tamplate_param = operation_param
+            test_filename =  './tests/test_interface_' +\
+                             operation_param['interface_name'].replace('/','-') + '_' +\
+                             operation_param['interface_status'] + '.yml'
+
         else:
             pass
+
+        
+         
 
         self.generate_testfile(
             template_filename   = template_filename,
@@ -109,7 +124,8 @@ class Router:
                 expected_value = snapcheck.test_details.values()[0][0]['expected_node_value']
                 acutual_value  = snapcheck.test_details.values()[0][0]['passed'][0]['actual_node_value']
 
-                message =   'expected value : %s\n' % (expected_value) +\
+                message =   'test file      : %s\n' % test_filename +\
+                            'expected value : %s\n' % (expected_value) +\
                             'acutual  value : %s'   % (acutual_value)
             elif snapcheck.result == 'Failed':
                 test_result = False
@@ -117,21 +133,28 @@ class Router:
                 expected_value = snapcheck.test_details.values()[0][0]['expected_node_value']
                 acutual_value  = snapcheck.test_details.values()[0][0]['failed'][0]['actual_node_value']
 
-                message =   'expected value : %s\n' % (expected_value) +\
+                message =   'test file      : %s\n' % test_filename +\
+                            'expected value : %s\n' % (expected_value) +\
                             'acutual  value : %s'   % (acutual_value)                
+        
+            # for debug
+            '''
+            for snapcheck in snapcheck_dict:
+                print(test_filename )
+                print("Final result : ", snapcheck.result)
+                print("Total passed : ",   snapcheck.no_passed)
+                print("Total failed : ",   snapcheck.no_failed)
+                print('snapcheck test_details : ')
+                print('-'*30)
+                pprint(dict(snapcheck.test_details)) 
+                print('-'*30)
+            '''
+            
+            
         return test_result, message
         
-        # for debug
-        ''''
-        for snapcheck in snapcheck_dict:
-            print("Final result : ", snapcheck.result)
-            print("Total passed : ",   snapcheck.no_passed)
-            print("Total failed : ",   snapcheck.no_failed)
-            print('snapcheck test_details : ')
-            print('-'*30)
-            pprint(dict(snapcheck.test_details)) 
-            print('-'*30)
-        '''
+     
+        
 
 
     def generate_testfile(self, template_filename, template_param, test_filename):  

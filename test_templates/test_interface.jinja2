@@ -1,0 +1,7 @@
+test_interface_{{ interface_name }}_{{ interface_status }}:
+  - command: show interfaces terse {{ interface_name }}
+  - item:
+      xpath: physical-interface
+      tests:
+        - is-equal: admin-status, {{ interface_status }}
+        - is-equal: oper-status,  {{ interface_status }}
