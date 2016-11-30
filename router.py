@@ -62,6 +62,14 @@ class Router:
         if operation_name == 'set_add_interface':
             template_filename = './set_templates/add_interface.jinja2'
             tamplate_param = operation_param
+        elif operation_name == 'set_add_bgp_neighbor':
+            template_filename = './set_templates/add_bgp_neighbor.jinja2'
+            tamplate_param = operation_param
+        elif operation_name == 'set_add_bgp_policy_external':
+            template_filename = './set_templates/add_bgp_policy_external.jinja2'
+            tamplate_param = operation_param
+        else:
+            pass
 
         config_txt = self.generate_from_jinja2(template_filename, tamplate_param)
         
