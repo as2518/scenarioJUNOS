@@ -56,17 +56,12 @@ def main():
         sys.stderr.write(str(error))
         sys.exit(1)
 
-    print(param['hosts']['management_ipaddress'])
-    print(param['hosts']['username'])
-    print(param['hosts']['password'])
-
 
     router1 = Router(
-            ipaddress   = param['hosts']['management_ipaddress'],
-            username    = param['hosts']['username'],
-            password    = param['hosts']['password'])
-
-    
+                hostname    = param['hosts']['hostname'],
+                ipaddress   = param['hosts']['management_ipaddress'],
+                username    = param['hosts']['username'],
+                password    = param['hosts']['password'])
 
     print('########## Run Senario : ' + args.file + ' ##########')
 
@@ -76,10 +71,6 @@ def main():
     print('purpose :')
     print(param['purpus'])
     
-    print('Operation Start : ', end='')
-    print(Fore.GREEN + 'OK')
-
-
     print('Connect to ' + param['hosts']['hostname'] + ' : ', end='')
     router1.open()
     print(Fore.GREEN + 'OK')
@@ -88,6 +79,25 @@ def main():
     router1.lock()
     print(Fore.GREEN + 'OK')
 
+    for operation in param['scenario']:
+  
+        print('Test on %s : '%(operation), end='')
+  
+        if "test_" in operation:
+            result, message = router1.snaptest(operation)
+            
+            if result : 
+                print(Fore.GREEN + 'OK')
+                print(Fore.GREEN + message)
+            else:
+                print(Fore.RED + 'NG')
+                print(Fore.RED + message)
+
+        elif "set_" in operation:
+            pass
+        else:
+            print('Cannnot run operation : ' + operation)
+ 
     print('Unlock configure mode : ', end='')
     router1.unlock()
     print(Fore.GREEN + 'OK')
@@ -96,20 +106,10 @@ def main():
     router1.close()
     print(Fore.GREEN + 'OK')
 
+    print('########## End Senario : ' + args.file + ' ##########')
+
+
 '''
-    dev1 = Device(
-            host = param['hosts']['device'],
-            user = param['hosts']['username'],
-            password = param['hosts']['password'],
-            port = 22)
-    dev1.open()
-    dev1.bind(cu=Config)
-    dev1.cu.lock()
-    
-
-    
-    jsnapy = SnapAdmin()
-
     for menue in param['scenario']:
         pprint(menue)
         if 'test_' in menue:
@@ -123,16 +123,7 @@ def main():
         else:
             pass
             print(Fore.GREEN + 'else')
-    
-       
-            
-            
 
-    print('Closing conection to ' + param['hosts']['hostname'] + ' : ', end='')
-
-    dev1.cu.unlock()
-    dev1.close()
-    print(Fore.GREEN + 'OK')
 '''
 
 if __name__ == '__main__':

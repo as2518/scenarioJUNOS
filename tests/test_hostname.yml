@@ -3,7 +3,6 @@ test_hostname:
   - item:
       xpath: '/software-information'
       tests:
-        # TODO: ホスト名を変数化したい。ただしJSNAPyはテンプレート非対応
         - is-equal: host-name, firefly1
           info: "Test : OK, hostname : {{pre['host-name']}}" 
           err:  "Test : NG, hostname : {{pre['host-name']}}"

@@ -1,7 +1,0 @@
-# for one device, can be given like this:
-hosts:
-  - device: 192.168.34.16 
-    username: user1
-    passwd: password
-tests:
-  - ./samples/test_is_equal.yml
