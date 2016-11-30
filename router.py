@@ -40,16 +40,51 @@ class Router:
     def close(self):
         self.device.close()
 
-    def snaptest(self, operation):
+    def commit(self):
+        return self.device.cu.commit()
+
+    def rollback(self):
+        return self.device.cu.rollback()
+
+    def diff_config(self):
+        return self.device.cu.diff()
+    
+    def commit_check(self):
+        return self.device.cu.commit_check()
+        
+    def load_config(self, operation_param):
+        set_result = False
+        message = ''
+        operation_name = operation_param.keys()[0]
+        if operation_name == 'set_add_interface':
+            template_filename = './set_templates/add_interface.jinja2'
+            tamplate_param = operation_param[operation_name]
+
+        config_txt = self.generate_from_jinja2(template_filename, tamplate_param)
+        
+        self.device.cu.load(
+            template_path   = template_filename, 
+            template_vars   = tamplate_param, 
+            format          = "text",
+            merge           = True )
+        
+        message = config_txt
+        set_result = True
+        
+        return set_result, message
+    
+        
+
+    def snaptest(self, operation_name):
         
         test_result = False
         message = ''
 
-        if operation == 'test_hostname':
+        if operation_name == 'test_hostname':
             template_filename = './test_templates/test_hostname.jinja2'
             tamplate_param = { 'hostname' : self.hostname }
             test_filename =  './tests/test_hostname_' + self.hostname + '.yml'
-        elif operation == 'test_model':
+        elif operation_name == 'test_model':
             template_filename = './test_templates/test_model.jinja2'
             tamplate_param = { 'model' : self.model }
             test_filename =  './tests/test_model_' + self.hostname + '.yml'
@@ -69,18 +104,19 @@ class Router:
         for snapcheck in snapcheck_dict:
 
             if snapcheck.result == 'Passed':
+                test_result = True
+
                 expected_value = snapcheck.test_details.values()[0][0]['expected_node_value']
                 acutual_value  = snapcheck.test_details.values()[0][0]['passed'][0]['actual_node_value']
 
-                test_result = True
                 message =   'expected value : %s\n' % (expected_value) +\
                             'acutual  value : %s'   % (acutual_value)
             elif snapcheck.result == 'Failed':
+                test_result = False
+
                 expected_value = snapcheck.test_details.values()[0][0]['expected_node_value']
                 acutual_value  = snapcheck.test_details.values()[0][0]['failed'][0]['actual_node_value']
 
-
-                test_result = False
                 message =   'expected value : %s\n' % (expected_value) +\
                             'acutual  value : %s'   % (acutual_value)                
         return test_result, message
@@ -97,16 +133,20 @@ class Router:
             print('-'*30)
         '''
 
-    
 
-    def generate_testfile(self, template_filename, template_param, test_filename):
-        # read template file (jinja2 format)
-        with open(template_filename, 'r') as conf:
-            template_jinja2 = conf.read()
-
-        # generate test file from template file
-        test_yml = Environment().from_string(template_jinja2).render(template_param)
-        
+    def generate_testfile(self, template_filename, template_param, test_filename):  
+        test_yml = self.generate_from_jinja2(template_filename, template_param)
+       
         # write test file (YAML format)
         with open(test_filename, 'w') as f:
             f.write(test_yml)
+
+    def generate_from_jinja2(self, template_filename, template_param):
+        # read template file (jinja2 format)
+        with open(template_filename, 'r') as f:
+            template_jinja2 = f.read()
+
+        # generate test file from template file
+        output_txt = Environment().from_string(template_jinja2).render(template_param)
+
+        return output_txt

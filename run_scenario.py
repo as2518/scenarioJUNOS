@@ -9,19 +9,9 @@ import yaml
 from pprint import pprint, pformat
 from argparse import ArgumentParser
 
-# timestamp
-from datetime import datetime
-
 # clolor font
 import colorama
 from colorama import Fore, Back, Style
-
-# PyEZ
-from jnpr.junos import Device
-from jnpr.junos.utils.config import Config
-
-# JSNAPy
-from jnpr.jsnapy import SnapAdmin
 
 from router import Router
 
@@ -81,13 +71,16 @@ def main():
     router1.lock()
     print(Fore.GREEN + 'OK')
 
-    for operation in param['scenario']:
-  
-        print('Test on "%s" : '%(operation), end='')
-  
-        if "test_" in operation:
-            result, message = router1.snaptest(operation)
-            
+    for operation_param in param['scenario']:
+        if isinstance(operation_param , dict):
+            operation_name = operation_param.keys()[0]
+        else:
+            operation_name = operation_param 
+          
+        if "test_" in operation_name:
+            print('Test on < %s > : '%(operation_name), end='')
+
+            result, message = router1.snaptest(operation_name)
             if result : 
                 print(Fore.GREEN + 'OK')
                 print(Fore.GREEN + message)
@@ -95,8 +88,50 @@ def main():
                 print(Fore.RED + 'NG')
                 print(Fore.RED + message)
 
-        elif "set_" in operation:
-            pass
+        elif "set_" in operation_name:
+            print('Load config on < %s > : '%(operation_name), end='')
+            result, message = router1.load_config(operation_param)
+            if result : 
+                print(Fore.GREEN + 'OK')
+                print('-'*30)
+                print('Set config: ')
+                print('-'*30)
+                print(Fore.YELLOW + message)
+                print('-'*30)
+            else:
+                print(Fore.RED + 'NG')
+                print(Fore.RED + message)
+
+
+            print('Diff config :')
+            message = router1.diff_config()
+            print('-'*30)
+            print(Fore.YELLOW + message)
+            print('-'*30)
+
+
+            print('Commit Check : ', end='')
+            if router1.commit_check():
+                print(Fore.GREEN + 'OK')
+            else:
+                print(Fore.RED + 'NG')
+
+            
+            print(Fore.YELLOW + "Do you commit? y/n")
+            choice = raw_input().lower()
+            if choice == 'y':
+                print('Commit : ', end='')
+                if router1.commit():
+                    print(Fore.GREEN + 'OK')
+                else:
+                    print(Fore.RED + 'NG')
+            else:
+                print('Rollback : ', end='')
+                if router1.rollback():
+                    print(Fore.GREEN + 'OK')
+                else:
+                    print(Fore.RED + 'NG')
+            
         else:
             print('Cannnot run operation : ' + operation)
  
