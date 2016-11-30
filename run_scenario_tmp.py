@@ -23,12 +23,65 @@ from jnpr.junos.utils.config import Config
 # JSNAPy
 from jnpr.jsnapy import SnapAdmin
 
-from router import Router
+def run_test(device, jsnapy, menue, param=None):
+    print('Run %s : ' % menue, end='')
+
+    #jsnapy = SnapAdmin()
+    timestamp = datetime.now().strftime('%Y%m%d-%H%M')
+    snap_name = 'snap' + timestamp
+
+    # 知見: snapcheck関数でDeviceクラスを利用するときはhost部は不要 
+    #jsnapy_config = jsnapy_config_host +\
+    jsnapy_config =\
+        'tests:\n' +\
+        ' - ./tests/%s.yml' % (menue)
+    #print(jsnapy.snapcheck(data=jsnapy_config, file_name=snap_name, dev=dev1))
+    
+    snapcheck_list = jsnapy.snapcheck(
+                        data=jsnapy_config,
+                        file_name=snap_name,
+                        dev=device)
+    
+    pprint(snapcheck_list)
+    
+    print('start check')
+    for snapcheck in snapcheck_list:
+        #pprint(dict(snapcheck.test_details))
+        #pprint(dict(snapcheck.log_detail))
+        pprint(snapcheck.logger_testop)
+        pprint(dict(snapcheck.result_dict))
+
+        if snapcheck.result == 'Passed':
+            print(Fore.GREEN + 'OK')
+        elif snapcheck.result == 'Failed':
+            print(Fore.RED + 'NG')
+            #print(Fore.RED + dict(snapcheck.test_details))
+            print(Fore.RED, end='')
+            print(Fore.RED + pformat(dict(snapcheck.test_details)))
+        else:
+            print('else2')
+    print('finish check')
+        
+    
+
+
+def run_pyez(option, device):
+    output = ''
+    if option == 'show_hostname':
+        output = "hostname : %s" % ( device.facts['hostname'])
+    elif option == 'show_model':
+        output = "model : %s"    % ( device.facts['model'])
+    elif option == 'show_version':
+        output == "version: %s"   % ( device.facts['version'])
+    else:
+        output = 'Error option'
+
+    return output
 
 def main():
     """main function."""
 
-    # Parse argment
+     # Parse argment
     parser = ArgumentParser(description='run scenario_file')
     parser.add_argument('-f', '--file',
                         type=str,
@@ -56,47 +109,23 @@ def main():
         sys.stderr.write(str(error))
         sys.exit(1)
 
-    print(param['hosts']['management_ipaddress'])
-    print(param['hosts']['username'])
-    print(param['hosts']['password'])
-
-
-    router1 = Router(
-            ipaddress   = param['hosts']['management_ipaddress'],
-            username    = param['hosts']['username'],
-            password    = param['hosts']['password'])
-
-    
+    #pprint(param)
 
     print('########## Run Senario : ' + args.file + ' ##########')
 
-    print('operator : '         + param['operator'])
-    print('operation_date : '   + str(param['operation_date']))
-    print('hostname : '         + param['hosts']['hostname'])
+    print('operator : ' + param['operator'])
+    print('operation_date : ' + str(param['operation_date']))
+    print('hostname : ' + param['hosts']['hostname'])
     print('purpose :')
     print(param['purpus'])
-    
+    #print(param['scenario'])
+
+    #print(param['scenario'][0])
+
     print('Operation Start : ', end='')
     print(Fore.GREEN + 'OK')
 
-
-    print('Connect to ' + param['hosts']['hostname'] + ' : ', end='')
-    router1.open()
-    print(Fore.GREEN + 'OK')
-
-    print('Lock configure mode : ', end='')
-    router1.lock()
-    print(Fore.GREEN + 'OK')
-
-    print('Unlock configure mode : ', end='')
-    router1.unlock()
-    print(Fore.GREEN + 'OK')
-
-    print('Close the connection to ' + param['hosts']['hostname'] + ' : ', end='')
-    router1.close()
-    print(Fore.GREEN + 'OK')
-
-'''
+    print('Connecting to ' + param['hosts']['hostname'] + ' : ', end='')
     dev1 = Device(
             host = param['hosts']['device'],
             user = param['hosts']['username'],
@@ -105,7 +134,7 @@ def main():
     dev1.open()
     dev1.bind(cu=Config)
     dev1.cu.lock()
-    
+    print(Fore.GREEN + 'OK')
 
     
     jsnapy = SnapAdmin()
@@ -133,7 +162,7 @@ def main():
     dev1.cu.unlock()
     dev1.close()
     print(Fore.GREEN + 'OK')
-'''
+    
 
 if __name__ == '__main__':
     main()
