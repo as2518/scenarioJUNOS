@@ -82,32 +82,42 @@ class Router:
         
         test_result = False
         message = ''
+        template_filename = ''
 
         if operation_name == 'test_hostname':
-            template_filename = './test_templates/test_hostname.jinja2'
+            template_filename = './test_templates/%s.jinja2' % (operation_name)
             tamplate_param = { 'hostname' : self.hostname }
-            test_filename =  './tests/test_hostname_' + self.hostname + '.yml'
+            test_filename =  './tests/' + operation_name + '_' + self.hostname + '.yml'
         elif operation_name == 'test_model':
-            template_filename = './test_templates/test_model.jinja2'
+            template_filename = './test_templates/%s.jinja2' % (operation_name)
             tamplate_param = { 'model' : self.model }
-            test_filename =  './tests/test_model_' + self.hostname + '.yml'
+            test_filename =  './tests/' + operation_name + '_' + self.hostname + '.yml'
         elif operation_name == 'test_interface':
-            template_filename = './test_templates/test_interface.jinja2'
+            template_filename = './test_templates/%s.jinja2' % (operation_name)
             tamplate_param = operation_param
-            test_filename =  './tests/test_interface_' +\
+            test_filename =  './tests/' + operation_name + '_' +\
                              operation_param['interface_name'].replace('/','-') + '_' +\
                              operation_param['interface_status'] + '.yml'
         elif operation_name == 'test_bgp_neighbor':
-            template_filename = './test_templates/test_bgp_neighbor.jinja2'
+            template_filename = './test_templates/%s.jinja2' % (operation_name)
             tamplate_param = operation_param
-            test_filename =  './tests/test_bgp_neighbor_' +\
+            test_filename =  './tests/' + operation_name + '_' +\
                              operation_param['neighbor_address_ipv4'].replace('.','-') + '_' +\
-                             operation_param['neighbor_status'] + '.yml'                     
+                             operation_param['neighbor_status'] + '.yml'
+        elif operation_name == 'test_bgp_received_route':
+            template_filename = './test_templates/%s.jinja2' % (operation_name)
+            tamplate_param = operation_param
+            test_filename =  './tests/' + operation_name + '_' +\
+                             operation_param['neighbor_address_ipv4'].replace('.','-') + '_' +\
+                             operation_param['received_route_address_ipv4'].replace('.','-') + '.yml'
+        elif operation_name == 'test_bgp_advertised_route':
+            template_filename = './test_templates/%s.jinja2' % (operation_name)
+            tamplate_param = operation_param
+            test_filename =  './tests/' + operation_name + '_' +\
+                             operation_param['neighbor_address_ipv4'].replace('.','-') + '_' +\
+                             operation_param['advertised_route_address_ipv4'].replace('.','-') + '.yml'
         else:
             pass
-
-        
-         
 
         self.generate_testfile(
             template_filename   = template_filename,
@@ -124,8 +134,15 @@ class Router:
             if snapcheck.result == 'Passed':
                 test_result = True
 
-                expected_value = snapcheck.test_details.values()[0][0]['expected_node_value']
-                acutual_value  = snapcheck.test_details.values()[0][0]['passed'][0]['actual_node_value']
+                if operation_name == 'test_bgp_received_route':
+                    expected_value = '%s/%s' % (operation_param['received_route_address_ipv4'], operation_param['received_route_subnet_ipv4'])
+                    acutual_value = snapcheck.test_details.values()[0][0]['passed'][0]['pre'].keys()[0]
+                elif operation_name == 'test_bgp_advertised_route':
+                    expected_value = '%s/%s' % (operation_param['advertised_route_address_ipv4'], operation_param['advertised_route_subnet_ipv4'])
+                    acutual_value = snapcheck.test_details.values()[0][0]['passed'][0]['pre'].keys()[0]
+                else:
+                    expected_value = snapcheck.test_details.values()[0][0]['expected_node_value']
+                    acutual_value  = snapcheck.test_details.values()[0][0]['passed'][0]['actual_node_value']
 
                 message =   'test file      : %s\n' % test_filename +\
                             'expected value : %s\n' % (expected_value) +\
@@ -152,6 +169,7 @@ class Router:
                 pprint(dict(snapcheck.test_details)) 
                 print('-'*30)
             '''
+            
             
             
         return test_result, message
