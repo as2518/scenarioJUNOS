@@ -59,15 +59,17 @@ def main():
 
     router1 = Router(
                 hostname    = param['hosts']['hostname'],
+                model       = param['hosts']['model'],
                 ipaddress   = param['hosts']['management_ipaddress'],
                 username    = param['hosts']['username'],
                 password    = param['hosts']['password'])
 
     print('########## Run Senario : ' + args.file + ' ##########')
 
-    print('operator : '         + param['operator'])
-    print('operation_date : '   + str(param['operation_date']))
-    print('hostname : '         + param['hosts']['hostname'])
+    print('operator : %s'       % (param['operator']) )
+    print('operation_date : %d' % (param['operation_date']) )
+    print('hostname : %s'       % (param['hosts']['hostname']) )
+    print('model : %s'          % (param['hosts']['model']) )
     print('purpose :')
     print(param['purpus'])
     
@@ -81,7 +83,7 @@ def main():
 
     for operation in param['scenario']:
   
-        print('Test on %s : '%(operation), end='')
+        print('Test on "%s" : '%(operation), end='')
   
         if "test_" in operation:
             result, message = router1.snaptest(operation)
@@ -108,23 +110,6 @@ def main():
 
     print('########## End Senario : ' + args.file + ' ##########')
 
-
-'''
-    for menue in param['scenario']:
-        pprint(menue)
-        if 'test_' in menue:
-            if menue ==  'test_hostname':
-                run_test(device=dev1,jsnapy=jsnapy, menue=menue)
-            elif menue == 'test_cpu':
-                run_test(device=dev1,jsnapy=jsnapy, menue=menue)
-        elif 'set_' in menue:
-            #pass
-            print(Fore.GREEN + 'set_')
-        else:
-            pass
-            print(Fore.GREEN + 'else')
-
-'''
 
 if __name__ == '__main__':
     main()

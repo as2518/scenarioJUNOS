@@ -12,3 +12,4 @@ hosts:
   password: password1
 scenario:
   - test_hostname
+  - test_model

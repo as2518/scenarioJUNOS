@@ -18,13 +18,14 @@ from jnpr.jsnapy import SnapAdmin
 from pprint import pprint, pformat
 
 class Router:
-    def __init__(self, hostname, ipaddress, username, password):
-        self.hostname = hostname
-        self.username = username
-        self.password = password
+    def __init__(self, hostname, model, ipaddress, username, password):
+        self.hostname  = hostname
+        self.model     = model
+        self.username  = username
+        self.password  = password
         self.ipaddress = ipaddress
-        self.device = Device(host=ipaddress, user=username, password=password)
-        self.snap = SnapAdmin()
+        self.device    = Device(host=ipaddress, user=username, password=password)
+        self.snap      = SnapAdmin()
 
     def open(self):
         self.device.open()
@@ -48,6 +49,10 @@ class Router:
             template_filename = './test_templates/test_hostname.jinja2'
             tamplate_param = { 'hostname' : self.hostname }
             test_filename =  './tests/test_hostname_' + self.hostname + '.yml'
+        elif operation == 'test_model':
+            template_filename = './test_templates/test_model.jinja2'
+            tamplate_param = { 'model' : self.model }
+            test_filename =  './tests/test_model_' + self.hostname + '.yml'
         else:
             pass
 
@@ -62,15 +67,22 @@ class Router:
         snapcheck_dict = self.snap.snapcheck(data=jsnapy_conf, dev=self.device)
 
         for snapcheck in snapcheck_dict:
+
             if snapcheck.result == 'Passed':
+                expected_value = snapcheck.test_details.values()[0][0]['expected_node_value']
+                acutual_value  = snapcheck.test_details.values()[0][0]['passed'][0]['actual_node_value']
+
                 test_result = True
-                message =   'expected value : %s\n' %(snapcheck.test_details.values()[0][0]['expected_node_value']) +\
-                            'acutual  value : %s' %(snapcheck.test_details.values()[0][0]['passed'][0]['actual_node_value'])
+                message =   'expected value : %s\n' % (expected_value) +\
+                            'acutual  value : %s'   % (acutual_value)
             elif snapcheck.result == 'Failed':
+                expected_value = snapcheck.test_details.values()[0][0]['expected_node_value']
+                acutual_value  = snapcheck.test_details.values()[0][0]['failed'][0]['actual_node_value']
+
+
                 test_result = False
-                message =   'expected value : %s\n' %(snapcheck.test_details.values()[0][0]['expected_node_value']) +\
-                            'acutual  value : %s' %(snapcheck.test_details.values()[0][0]['failed'][0]['actual_node_value'])
-                
+                message =   'expected value : %s\n' % (expected_value) +\
+                            'acutual  value : %s'   % (acutual_value)                
         return test_result, message
         
         # for debug
