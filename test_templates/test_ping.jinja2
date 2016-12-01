@@ -1,0 +1,6 @@
+test_ping_{{ target_ipaddress }}:
+  - command: ping {{ target_ipaddress }} count 100 rapid
+  - item:
+      xpath: probe-results-summary
+      tests:
+        - is-equal: packet-loss, 0

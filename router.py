@@ -124,6 +124,11 @@ class Router:
             test_filename =  './tests/' + operation_name + '_' +\
                              operation_param['neighbor_address_ipv4'].replace('.','-') + '_' +\
                              operation_param['advertised_route_address_ipv4'].replace('.','-') + '.yml'
+        elif operation_name == 'test_ping':
+            template_filename = './test_templates/%s.jinja2' % (operation_name)
+            tamplate_param = operation_param
+            test_filename =  './tests/' + operation_name + '_' +\
+                             operation_param['target_ipaddress'].replace('.','-') + '.yml'
         else:
             pass
 
@@ -157,9 +162,16 @@ class Router:
                             'acutual  value : %s'   % (acutual_value)
             elif snapcheck.result == 'Failed':
                 test_result = False
-
-                expected_value = snapcheck.test_details.values()[0][0]['expected_node_value']
-                acutual_value  = snapcheck.test_details.values()[0][0]['failed'][0]['actual_node_value']
+                
+                if operation_name == 'test_bgp_received_route':
+                    expected_value = '%s/%s' % (operation_param['received_route_address_ipv4'], operation_param['received_route_subnet_ipv4'])
+                    acutual_value = 'None'
+                elif operation_name == 'test_bgp_advertised_route':
+                    expected_value = '%s/%s' % (operation_param['advertised_route_address_ipv4'], operation_param['advertised_route_subnet_ipv4'])
+                    acutual_value = 'None'
+                else:
+                    expected_value = snapcheck.test_details.values()[0][0]['expected_node_value']
+                    acutual_value  = snapcheck.test_details.values()[0][0]['failed'][0]['actual_node_value']
 
                 message =   'test file      : %s\n' % test_filename +\
                             'expected value : %s\n' % (expected_value) +\

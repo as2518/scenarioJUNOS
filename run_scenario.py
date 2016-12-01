@@ -8,10 +8,11 @@ import sys
 import yaml
 from pprint import pprint, pformat
 from argparse import ArgumentParser
-
+import time
 # clolor font
 import colorama
 from colorama import Fore, Back, Style
+
 
 from router import Router
 
@@ -134,8 +135,13 @@ def main():
                 else:
                     print(Fore.RED + 'NG')
             
+        elif operation_name == 'sleep_10sec':
+            print('sleep 10 sec : ', end='')
+            time.sleep(10)
+            print(Fore.GREEN + 'OK')
+
         else:
-            print('Cannnot run operation : ' + operation)
+            print('Cannnot run operation : ' + operation_name)
  
     print('Unlock configure mode : ', end='')
     router1.unlock()

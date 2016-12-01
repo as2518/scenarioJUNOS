@@ -1,0 +1,6 @@
+test_ping_192.168.35.1:
+  - command: ping 192.168.35.1 count 100 wait 1
+  - item:
+      xpath: probe-results-summary
+      tests:
+      - is-equal: packet-loss, 0 
