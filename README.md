@@ -1,8 +1,7 @@
 # scenarioJUNOS
 Scenario based Network Operation Tool for JUNOS router using PyEZ/JSNAPy.
 
-System
-![system_en](https://cloud.githubusercontent.com/assets/7057797/21740336/53a2cffa-d4fa-11e6-8971-f6627333a14e.png)
+<img src="https://cloud.githubusercontent.com/assets/7057797/21740336/53a2cffa-d4fa-11e6-8971-f6627333a14e.png" width="320px">
 
 # How to run
 
@@ -98,13 +97,14 @@ test_interface_{{ interface_name }}_{{ interface_status }}:
 demo: configuring interface and BGP neighbor setting
 - Left : scenarioJUNOS tool
 - Right top : target JUNOS router(hostname: firefly1)
-- Right bottom : BGP neighbor router, not target (hostname: firefly2)
+- Right bottom : not target router, BGP neighbor (hostname: firefly2)
 
 ![demo](https://qiita-image-store.s3.amazonaws.com/0/45596/c29b2bca-e4e0-aab9-58c7-f2e382ceea2f.gif)
 
-green: OK statement
-red: NG statement
-yellow: User determination statement (example: commit or discard)
+- green: OK statement
+- red: NG statement
+- yellow: User determination statement (example: commit or discard, candidate config, diff config)
+
 ![Screen Shot 2016-12-02 at 8.21.18 AM.png](https://qiita-image-store.s3.amazonaws.com/0/45596/bb6b4404-ea84-128a-c6d5-4575ce44a2a1.png)
 ![Screen Shot 2016-12-02 at 8.21.35 AM.png](https://qiita-image-store.s3.amazonaws.com/0/45596/a19f75c3-b707-50d0-7ea7-a1cdb682d98f.png)
 ![Screen Shot 2016-12-02 at 8.22.03 AM.png](https://qiita-image-store.s3.amazonaws.com/0/45596/0429eebd-9d78-8544-e7b6-f860eb9f43ed.png)
