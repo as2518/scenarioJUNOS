@@ -1,7 +1,7 @@
 # scenarioJUNOS
 Scenario based Network Operation Tool for JUNOS router using PyEZ/JSNAPy.
 
-<img src="https://cloud.githubusercontent.com/assets/7057797/21740336/53a2cffa-d4fa-11e6-8971-f6627333a14e.png" width="320px">
+<img src="https://cloud.githubusercontent.com/assets/7057797/21740465/592334f2-d4fe-11e6-83c9-68263642f252.png" width="500px">
 
 # How to run
 
