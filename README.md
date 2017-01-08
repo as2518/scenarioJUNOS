@@ -1,26 +1,13 @@
 # scenarioJUNOS
 Scenario based Network Operation Tool for JUNOS router using PyEZ/JSNAPy.
 
-
+<img src="https://cloud.githubusercontent.com/assets/7057797/21740465/592334f2-d4fe-11e6-83c9-68263642f252.png" width="500px">
 
 # How to run
 
 ```
 python run_scenario.py -f <scenario file>
 ```
-
-# Output Sample
-
-![demo](https://qiita-image-store.s3.amazonaws.com/0/45596/c29b2bca-e4e0-aab9-58c7-f2e382ceea2f.gif)
-
-
-![Screen Shot 2016-12-02 at 8.21.18 AM.png](https://qiita-image-store.s3.amazonaws.com/0/45596/bb6b4404-ea84-128a-c6d5-4575ce44a2a1.png)
-![Screen Shot 2016-12-02 at 8.21.35 AM.png](https://qiita-image-store.s3.amazonaws.com/0/45596/a19f75c3-b707-50d0-7ea7-a1cdb682d98f.png)
-![Screen Shot 2016-12-02 at 8.22.03 AM.png](https://qiita-image-store.s3.amazonaws.com/0/45596/0429eebd-9d78-8544-e7b6-f860eb9f43ed.png)
-![Screen Shot 2016-12-02 at 8.22.25 AM.png](https://qiita-image-store.s3.amazonaws.com/0/45596/80e71156-02d4-e807-0a9c-fe9bf3781747.png)
-![Screen Shot 2016-12-02 at 8.22.37 AM.png](https://qiita-image-store.s3.amazonaws.com/0/45596/7a852322-a2ef-5d22-85dc-fbbc107a31a0.png)
-
-
 
 #Scenario file sample
 
@@ -104,3 +91,22 @@ test_interface_{{ interface_name }}_{{ interface_status }}:
         - is-equal: admin-status, {{ interface_status }}
         - is-equal: oper-status, {{ interface_status }}
 ```
+
+
+# Output Sample
+demo: configuring interface and BGP neighbor setting
+- Left : scenarioJUNOS tool
+- Right top : target JUNOS router(hostname: firefly1)
+- Right bottom : not target router, BGP neighbor (hostname: firefly2)
+
+![demo](https://qiita-image-store.s3.amazonaws.com/0/45596/c29b2bca-e4e0-aab9-58c7-f2e382ceea2f.gif)
+
+- green: OK statement
+- red: NG statement
+- yellow: User determination statement (example: commit or discard, candidate config, diff config)
+
+![Screen Shot 2016-12-02 at 8.21.18 AM.png](https://qiita-image-store.s3.amazonaws.com/0/45596/bb6b4404-ea84-128a-c6d5-4575ce44a2a1.png)
+![Screen Shot 2016-12-02 at 8.21.35 AM.png](https://qiita-image-store.s3.amazonaws.com/0/45596/a19f75c3-b707-50d0-7ea7-a1cdb682d98f.png)
+![Screen Shot 2016-12-02 at 8.22.03 AM.png](https://qiita-image-store.s3.amazonaws.com/0/45596/0429eebd-9d78-8544-e7b6-f860eb9f43ed.png)
+![Screen Shot 2016-12-02 at 8.22.25 AM.png](https://qiita-image-store.s3.amazonaws.com/0/45596/80e71156-02d4-e807-0a9c-fe9bf3781747.png)
+![Screen Shot 2016-12-02 at 8.22.37 AM.png](https://qiita-image-store.s3.amazonaws.com/0/45596/7a852322-a2ef-5d22-85dc-fbbc107a31a0.png)
