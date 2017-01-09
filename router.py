@@ -174,6 +174,7 @@ class Router:
                 message = 'test file      : %s\n' % test_filename +\
                     'expected value : %s\n' % (expected_value) +\
                     'acutual  value : %s' % (acutual_value)
+
             elif snapcheck.result == 'Failed':
                 test_result = False
 
