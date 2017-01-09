@@ -1,0 +1,7 @@
+test_hostname:
+  - command: show version
+  - item:
+      xpath: /software-information
+      tests:
+        - is-equal: host-name, test_router
+        - is-equal: host-name, test_router

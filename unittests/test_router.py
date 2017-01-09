@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import unittest
+import os
 import router
 
 class TestRouter(unittest.TestCase):
@@ -18,9 +19,6 @@ class TestRouter(unittest.TestCase):
         self.interface_address_ipv4 = '10.10.0.1'
         self.interface_subnet_ipv4 = '24'
 
-    def test_generate_testfile(self):
-        pass
-
     def test_generate_from_jinja2(self):
         template_filename =\
             './unittests/templates/set_add_interface.jinja2'
@@ -35,6 +33,30 @@ class TestRouter(unittest.TestCase):
             expected = file.read()
 
         self.assertEqual(actual, expected)
+
+    def test_generate_testfile(self):
+        template_filename =\
+            './unittests/templates/test_hostname.jinja2'
+        template_param = {'hostname': 'test_router'}
+        test_filename = './unittests/actual/test_hostname.yml'
+
+        actual_filename = test_filename
+        expected_filename = './unittests/expected/test_hostname.yml'
+
+        self.router.generate_testfile(
+            template_filename,
+            template_param,
+            test_filename)
+
+        with open(actual_filename, 'r') as file:
+            actual = file.read()
+
+        with open(expected_filename, 'r') as file:
+            expected = file.read()
+
+        self.assertEqual(actual, expected)
+
+        os.remove(actual_filename)
 
     def tearDown(self):
         pass
