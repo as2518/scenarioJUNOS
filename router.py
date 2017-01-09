@@ -17,20 +17,21 @@ from jnpr.jsnapy import SnapAdmin
 # arranged print
 from pprint import pprint, pformat
 
+
 class Router:
     def __init__(self, hostname, model, ipaddress, username, password):
-        self.hostname  = hostname
-        self.model     = model
-        self.username  = username
-        self.password  = password
+        self.hostname = hostname
+        self.model = model
+        self.username = username
+        self.password = password
         self.ipaddress = ipaddress
-        self.device    = Device(host=ipaddress, user=username, password=password)
-        self.snap      = SnapAdmin()
+        self.device = Device(host=ipaddress, user=username, password=password)
+        self.snap = SnapAdmin()
 
     def open(self):
         self.device.open()
         self.device.bind(cu=Config)
-    
+
     def lock(self):
         self.device.cu.lock()
 
@@ -52,10 +53,10 @@ class Router:
         else:
             message = ''
         return message
-    
+
     def commit_check(self):
         return self.device.cu.commit_check()
-        
+
     def load_config(self, operation_name, operation_param=None):
         set_result = False
         message = ''
@@ -66,134 +67,138 @@ class Router:
             template_filename = './set_templates/add_bgp_neighbor.jinja2'
             tamplate_param = operation_param
         elif operation_name == 'set_add_bgp_policy_external':
-            template_filename = './set_templates/add_bgp_policy_external.jinja2'
+            template_filename =\
+                './set_templates/add_bgp_policy_external.jinja2'
             tamplate_param = operation_param
         else:
             pass
 
-        config_txt = self.generate_from_jinja2(template_filename, tamplate_param)
-        
+        config_txt = self.generate_from_jinja2(
+            template_filename,
+            tamplate_param)
+
         self.device.cu.load(
-            template_path   = template_filename, 
-            template_vars   = tamplate_param, 
-            format          = "text",
-            merge           = True )
-        
+            template_path=template_filename,
+            template_vars=tamplate_param,
+            format="text",
+            merge=True)
+
         message = config_txt
         set_result = True
-        
+
         return set_result, message
-    
-        
 
     def snaptest(self, operation_name, operation_param=None):
-        
         test_result = False
         message = ''
         template_filename = ''
 
         if operation_name == 'test_hostname':
             template_filename = './test_templates/%s.jinja2' % (operation_name)
-            tamplate_param = { 'hostname' : self.hostname }
-            test_filename =  './tests/' + operation_name + '_' + self.hostname + '.yml'
+            tamplate_param = {'hostname': self.hostname}
+            test_filename = './tests/' + operation_name + '_' +\
+                            self.hostname +\
+                            '.yml'
         elif operation_name == 'test_model':
             template_filename = './test_templates/%s.jinja2' % (operation_name)
-            tamplate_param = { 'model' : self.model }
-            test_filename =  './tests/' + operation_name + '_' + self.hostname + '.yml'
+            tamplate_param = {'model': self.model}
+            test_filename = './tests/' + operation_name + '_' +\
+                            self.hostname +\
+                            '.yml'
         elif operation_name == 'test_interface':
             template_filename = './test_templates/%s.jinja2' % (operation_name)
             tamplate_param = operation_param
-            test_filename =  './tests/' + operation_name + '_' +\
-                             operation_param['interface_name'].replace('/','-') + '_' +\
-                             operation_param['interface_status'] + '.yml'
+            test_filename = './tests/' + operation_name + '_' +\
+                            operation_param['interface_name'].replace('/', '-') + '_' +\
+                            operation_param['interface_status'] +\
+                            '.yml'
         elif operation_name == 'test_bgp_neighbor':
             template_filename = './test_templates/%s.jinja2' % (operation_name)
             tamplate_param = operation_param
-            test_filename =  './tests/' + operation_name + '_' +\
-                             operation_param['neighbor_address_ipv4'].replace('.','-') + '_' +\
-                             operation_param['neighbor_status'] + '.yml'
+            test_filename = './tests/' + operation_name + '_' +\
+                            operation_param['neighbor_address_ipv4'].replace('.', '-') + '_' +\
+                            operation_param['neighbor_status'] +\
+                            '.yml'
         elif operation_name == 'test_bgp_received_route':
             template_filename = './test_templates/%s.jinja2' % (operation_name)
             tamplate_param = operation_param
-            test_filename =  './tests/' + operation_name + '_' +\
-                             operation_param['neighbor_address_ipv4'].replace('.','-') + '_' +\
-                             operation_param['received_route_address_ipv4'].replace('.','-') + '.yml'
+            test_filename = './tests/' + operation_name + '_' +\
+                            operation_param['neighbor_address_ipv4'].replace('.', '-') + '_' +\
+                            operation_param['received_route_address_ipv4'].replace('.', '-') +\
+                            '.yml'
         elif operation_name == 'test_bgp_advertised_route':
             template_filename = './test_templates/%s.jinja2' % (operation_name)
             tamplate_param = operation_param
-            test_filename =  './tests/' + operation_name + '_' +\
-                             operation_param['neighbor_address_ipv4'].replace('.','-') + '_' +\
-                             operation_param['advertised_route_address_ipv4'].replace('.','-') + '.yml'
+            test_filename = './tests/' + operation_name + '_' +\
+                            operation_param['neighbor_address_ipv4'].replace('.', '-') + '_' +\
+                            operation_param['advertised_route_address_ipv4'].replace('.', '-') +\
+                            '.yml'
         elif operation_name == 'test_ping':
             template_filename = './test_templates/%s.jinja2' % (operation_name)
             tamplate_param = operation_param
-            test_filename =  './tests/' + operation_name + '_' +\
-                             operation_param['target_ipaddress'].replace('.','-') + '.yml'
+            test_filename = './tests/' + operation_name + '_' +\
+                            operation_param['target_ipaddress'].replace('.', '-') +\
+                            '.yml'
         else:
             pass
 
         self.generate_testfile(
-            template_filename   = template_filename,
-            template_param      = tamplate_param,
-            test_filename       = test_filename)
+            template_filename=template_filename,
+            template_param=tamplate_param,
+            test_filename=test_filename)
 
         jsnapy_conf = 'tests:' + '\n' +\
                       '  - %s' % (test_filename)
-        
+
         snapcheck_dict = self.snap.snapcheck(data=jsnapy_conf, dev=self.device)
 
         for snapcheck in snapcheck_dict:
-
             if snapcheck.result == 'Passed':
                 test_result = True
 
                 if operation_name == 'test_bgp_received_route':
-                    expected_value = '%s/%s' % (operation_param['received_route_address_ipv4'], operation_param['received_route_subnet_ipv4'])
-                    acutual_value = snapcheck.test_details.values()[0][0]['passed'][0]['pre'].keys()[0]
+                    expected_value = '%s/%s' % (
+                        operation_param['received_route_address_ipv4'],
+                        operation_param['received_route_subnet_ipv4'])
+                    acutual_value =\
+                        snapcheck.test_details.values()[0][0]['passed'][0]['pre'].keys()[0]
                 elif operation_name == 'test_bgp_advertised_route':
-                    expected_value = '%s/%s' % (operation_param['advertised_route_address_ipv4'], operation_param['advertised_route_subnet_ipv4'])
+                    expected_value = '%s/%s' % (
+                        operation_param['advertised_route_address_ipv4'],
+                        operation_param['advertised_route_subnet_ipv4'])
                     acutual_value = snapcheck.test_details.values()[0][0]['passed'][0]['pre'].keys()[0]
                 else:
                     expected_value = snapcheck.test_details.values()[0][0]['expected_node_value']
-                    acutual_value  = snapcheck.test_details.values()[0][0]['passed'][0]['actual_node_value']
+                    acutual_value = snapcheck.test_details.values()[0][0]['passed'][0]['actual_node_value']
 
-                message =   'test file      : %s\n' % test_filename +\
-                            'expected value : %s\n' % (expected_value) +\
-                            'acutual  value : %s'   % (acutual_value)
+                message = 'test file      : %s\n' % test_filename +\
+                    'expected value : %s\n' % (expected_value) +\
+                    'acutual  value : %s' % (acutual_value)
             elif snapcheck.result == 'Failed':
                 test_result = False
-                
+
                 if operation_name == 'test_bgp_received_route':
-                    expected_value = '%s/%s' % (operation_param['received_route_address_ipv4'], operation_param['received_route_subnet_ipv4'])
+                    expected_value = '%s/%s' % (
+                        operation_param['received_route_address_ipv4'],
+                        operation_param['received_route_subnet_ipv4'])
                     acutual_value = 'None'
                 elif operation_name == 'test_bgp_advertised_route':
-                    expected_value = '%s/%s' % (operation_param['advertised_route_address_ipv4'], operation_param['advertised_route_subnet_ipv4'])
+                    expected_value = '%s/%s' % (
+                        operation_param['advertised_route_address_ipv4'],
+                        operation_param['advertised_route_subnet_ipv4'])
                     acutual_value = 'None'
                 else:
                     expected_value = snapcheck.test_details.values()[0][0]['expected_node_value']
-                    acutual_value  = snapcheck.test_details.values()[0][0]['failed'][0]['actual_node_value']
+                    acutual_value = snapcheck.test_details.values()[0][0]['failed'][0]['actual_node_value']
 
-                message =   'test file      : %s\n' % test_filename +\
-                            'expected value : %s\n' % (expected_value) +\
-                            'acutual  value : %s'   % (acutual_value)                
-        
-            # for debug
-            '''
-            for snapcheck in snapcheck_dict:
-                print(test_filename )
-                print("Final result : ", snapcheck.result)
-                print("Total passed : ",   snapcheck.no_passed)
-                print("Total failed : ",   snapcheck.no_failed)
-                print('snapcheck test_details : ')
-                print('-'*30)
-                pprint(dict(snapcheck.test_details)) 
-                print('-'*30)
-            '''            
+                message = 'test file      : %s\n' % test_filename +\
+                    'expected value : %s\n' % (expected_value) +\
+                    'acutual  value : %s' % (acutual_value)
+
         return test_result, message
 
-    def generate_testfile(self, template_filename, template_param, test_filename):  
+    def generate_testfile(self, template_filename, template_param, test_filename):
         test_yml = self.generate_from_jinja2(template_filename, template_param)
-       
         # write test file (YAML format)
         with open(test_filename, 'w') as f:
             f.write(test_yml)
@@ -204,6 +209,4 @@ class Router:
             template_jinja2 = f.read()
 
         # generate test file from template file
-        output_txt = Environment().from_string(template_jinja2).render(template_param)
-
-        return output_txt
+        return Environment().from_string(template_jinja2).render(template_param)
