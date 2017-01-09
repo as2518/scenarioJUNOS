@@ -99,7 +99,8 @@ demo: configuring interface and BGP neighbor setting
 - Right top : target JUNOS router(hostname: firefly1)
 - Right bottom : not target router, BGP neighbor (hostname: firefly2)
 
-![demo](https://qiita-image-store.s3.amazonaws.com/0/45596/c29b2bca-e4e0-aab9-58c7-f2e382ceea2f.gif)
+![demo_v4](https://cloud.githubusercontent.com/assets/7057797/21755993/b575a47c-d65e-11e6-92cc-79cc69fda877.gif)
+
 
 - green: OK statement
 - red: NG statement
