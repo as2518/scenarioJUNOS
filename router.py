@@ -188,15 +188,8 @@ class Router:
                 print('-'*30)
                 pprint(dict(snapcheck.test_details)) 
                 print('-'*30)
-            '''
-            
-            
-            
+            '''            
         return test_result, message
-        
-     
-        
-
 
     def generate_testfile(self, template_filename, template_param, test_filename):  
         test_yml = self.generate_from_jinja2(template_filename, template_param)
