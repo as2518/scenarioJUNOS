@@ -34,19 +34,19 @@ class TestRouter(unittest.TestCase):
 
         self.assertEqual(actual, expected)
 
-    def test_generate_testfile(self):
+    def test_generate_nwtestfile(self):
         template_filename =\
-            './unittests/templates/test_hostname.jinja2'
+            './unittests/templates/nwtest_hostname.jinja2'
         template_param = {'hostname': 'test_router'}
-        test_filename = './unittests/actual/test_hostname.yml'
+        nwtest_filename = './unittests/actual/nwtest_hostname.yml'
 
-        actual_filename = test_filename
-        expected_filename = './unittests/expected/test_hostname.yml'
+        actual_filename = nwtest_filename
+        expected_filename = './unittests/expected/nwtest_hostname.yml'
 
-        self.router.generate_testfile(
+        self.router.generate_nwtestfile(
             template_filename,
             template_param,
-            test_filename)
+            nwtest_filename)
 
         with open(actual_filename, 'r') as file:
             actual = file.read()

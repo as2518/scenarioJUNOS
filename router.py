@@ -88,81 +88,81 @@ class Router:
 
         return set_result, message
 
-    def snaptest(self, operation_name, operation_param=None):
-        test_result = False
+    def nwtest(self, operation_name, operation_param=None):
+        nwtest_result = False
         message = ''
         template_filename = ''
 
-        if operation_name == 'test_hostname':
-            template_filename = './test_templates/%s.jinja2' % (operation_name)
+        if operation_name == 'nwtest_hostname':
+            template_filename = './nwtest_templates/%s.jinja2' % (operation_name)
             tamplate_param = {'hostname': self.hostname}
-            test_filename = './tests/' + operation_name + '_' +\
+            nwtest_filename = './nwtests/' + operation_name + '_' +\
                             self.hostname +\
                             '.yml'
-        elif operation_name == 'test_model':
-            template_filename = './test_templates/%s.jinja2' % (operation_name)
+        elif operation_name == 'nwtest_model':
+            template_filename = './nwtest_templates/%s.jinja2' % (operation_name)
             tamplate_param = {'model': self.model}
-            test_filename = './tests/' + operation_name + '_' +\
+            nwtest_filename = './nwtests/' + operation_name + '_' +\
                             self.hostname +\
                             '.yml'
-        elif operation_name == 'test_interface':
-            template_filename = './test_templates/%s.jinja2' % (operation_name)
+        elif operation_name == 'nwtest_interface':
+            template_filename = './nwtest_templates/%s.jinja2' % (operation_name)
             tamplate_param = operation_param
-            test_filename = './tests/' + operation_name + '_' +\
+            nwtest_filename = './nwtests/' + operation_name + '_' +\
                             operation_param['interface_name'].replace('/', '-') + '_' +\
                             operation_param['interface_status'] +\
                             '.yml'
-        elif operation_name == 'test_bgp_neighbor':
-            template_filename = './test_templates/%s.jinja2' % (operation_name)
+        elif operation_name == 'nwtest_bgp_neighbor':
+            template_filename = './nwtest_templates/%s.jinja2' % (operation_name)
             tamplate_param = operation_param
-            test_filename = './tests/' + operation_name + '_' +\
+            nwtest_filename = './nwtests/' + operation_name + '_' +\
                             operation_param['neighbor_address_ipv4'].replace('.', '-') + '_' +\
                             operation_param['neighbor_status'] +\
                             '.yml'
-        elif operation_name == 'test_bgp_received_route':
-            template_filename = './test_templates/%s.jinja2' % (operation_name)
+        elif operation_name == 'nwtest_bgp_received_route':
+            template_filename = './nwtest_templates/%s.jinja2' % (operation_name)
             tamplate_param = operation_param
-            test_filename = './tests/' + operation_name + '_' +\
+            nwtest_filename = './nwtests/' + operation_name + '_' +\
                             operation_param['neighbor_address_ipv4'].replace('.', '-') + '_' +\
                             operation_param['received_route_address_ipv4'].replace('.', '-') +\
                             '.yml'
-        elif operation_name == 'test_bgp_advertised_route':
-            template_filename = './test_templates/%s.jinja2' % (operation_name)
+        elif operation_name == 'nwtest_bgp_advertised_route':
+            template_filename = './nwtest_templates/%s.jinja2' % (operation_name)
             tamplate_param = operation_param
-            test_filename = './tests/' + operation_name + '_' +\
+            nwtest_filename = './nwtests/' + operation_name + '_' +\
                             operation_param['neighbor_address_ipv4'].replace('.', '-') + '_' +\
                             operation_param['advertised_route_address_ipv4'].replace('.', '-') +\
                             '.yml'
-        elif operation_name == 'test_ping':
-            template_filename = './test_templates/%s.jinja2' % (operation_name)
+        elif operation_name == 'nwtest_ping':
+            template_filename = './nwtest_templates/%s.jinja2' % (operation_name)
             tamplate_param = operation_param
-            test_filename = './tests/' + operation_name + '_' +\
+            nwtest_filename = './nwtests/' + operation_name + '_' +\
                             operation_param['target_ipaddress'].replace('.', '-') +\
                             '.yml'
         else:
             pass
 
-        self.generate_testfile(
+        self.generate_nwtestfile(
             template_filename=template_filename,
             template_param=tamplate_param,
-            test_filename=test_filename)
+            nwtest_filename=nwtest_filename)
 
-        jsnapy_conf = 'tests:' + '\n' +\
-                      '  - %s' % (test_filename)
+        jsnapy_conf = 'nwtests:' + '\n' +\
+                      '  - %s' % (nwtest_filename)
 
         snapcheck_dict = self.snap.snapcheck(data=jsnapy_conf, dev=self.device)
 
         for snapcheck in snapcheck_dict:
             if snapcheck.result == 'Passed':
-                test_result = True
+                nwtest_result = True
 
-                if operation_name == 'test_bgp_received_route':
+                if operation_name == 'nwtest_bgp_received_route':
                     expected_value = '%s/%s' % (
                         operation_param['received_route_address_ipv4'],
                         operation_param['received_route_subnet_ipv4'])
                     acutual_value =\
                         snapcheck.test_details.values()[0][0]['passed'][0]['pre'].keys()[0]
-                elif operation_name == 'test_bgp_advertised_route':
+                elif operation_name == 'nwtest_bgp_advertised_route':
                     expected_value = '%s/%s' % (
                         operation_param['advertised_route_address_ipv4'],
                         operation_param['advertised_route_subnet_ipv4'])
@@ -171,19 +171,19 @@ class Router:
                     expected_value = snapcheck.test_details.values()[0][0]['expected_node_value']
                     acutual_value = snapcheck.test_details.values()[0][0]['passed'][0]['actual_node_value']
 
-                message = 'test file      : %s\n' % test_filename +\
+                message = 'nwtest file      : %s\n' % nwtest_filename +\
                     'expected value : %s\n' % (expected_value) +\
                     'acutual  value : %s' % (acutual_value)
 
             elif snapcheck.result == 'Failed':
-                test_result = False
+                nwtest_result = False
 
-                if operation_name == 'test_bgp_received_route':
+                if operation_name == 'nwtest_bgp_received_route':
                     expected_value = '%s/%s' % (
                         operation_param['received_route_address_ipv4'],
                         operation_param['received_route_subnet_ipv4'])
                     acutual_value = 'None'
-                elif operation_name == 'test_bgp_advertised_route':
+                elif operation_name == 'nwtest_bgp_advertised_route':
                     expected_value = '%s/%s' % (
                         operation_param['advertised_route_address_ipv4'],
                         operation_param['advertised_route_subnet_ipv4'])
@@ -192,22 +192,22 @@ class Router:
                     expected_value = snapcheck.test_details.values()[0][0]['expected_node_value']
                     acutual_value = snapcheck.test_details.values()[0][0]['failed'][0]['actual_node_value']
 
-                message = 'test file      : %s\n' % test_filename +\
+                message = 'nwtest file      : %s\n' % nwtest_filename +\
                     'expected value : %s\n' % (expected_value) +\
                     'acutual  value : %s' % (acutual_value)
 
-        return test_result, message
+        return nwtest_result, message
 
-    def generate_testfile(self, template_filename, template_param, test_filename):
-        test_yml = self.generate_from_jinja2(template_filename, template_param)
-        # write test file (YAML format)
-        with open(test_filename, 'w') as f:
-            f.write(test_yml)
+    def generate_nwtestfile(self, template_filename, template_param, nwtest_filename):
+        nwtest_yml = self.generate_from_jinja2(template_filename, template_param)
+        # write nwtest file (YAML format)
+        with open(nwtest_filename, 'w') as f:
+            f.write(nwtest_yml)
 
     def generate_from_jinja2(self, template_filename, template_param):
         # read template file (jinja2 format)
         with open(template_filename, 'r') as f:
             template_jinja2 = f.read()
 
-        # generate test file from template file
+        # generate nwtest file from template file
         return Environment().from_string(template_jinja2).render(template_param)

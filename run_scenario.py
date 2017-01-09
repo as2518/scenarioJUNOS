@@ -82,7 +82,7 @@ def main():
             operation_name = scenario_param
             operation_param = None
           
-        if "test_" in operation_name:
+        if "nwtest_" in operation_name:
             print('Test on < %s > : '%(operation_name), end='')
 
             result, message = router1.snaptest(operation_name, operation_param) 
