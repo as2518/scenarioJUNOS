@@ -80,9 +80,9 @@ interfaces {
 }
 ```
 
-router test template is put on './test_templates' directory.
+router test template is put on './nwtest_templates' directory.
 
-```yaml:./test_templates/test_interface.jinja2
+```yaml:./nwtest_templates/nwtest_interface.jinja2
 test_interface_{{ interface_name }}_{{ interface_status }}:
   - command: show interfaces terse {{ interface_name }}
   - item:
