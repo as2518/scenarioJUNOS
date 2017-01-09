@@ -94,51 +94,79 @@ class Router:
         template_filename = ''
 
         if operation_name == 'nwtest_hostname':
-            template_filename = './nwtest_templates/%s.jinja2' % (operation_name)
+            template_filename =\
+                './nwtest_templates/%s.jinja2' % (operation_name)
             tamplate_param = {'hostname': self.hostname}
-            nwtest_filename = './nwtests/' + operation_name + '_' +\
-                            self.hostname +\
-                            '.yml'
+            nwtest_filename =\
+                './nwtests/' +\
+                operation_name + '_' +\
+                self.hostname +\
+                '.yml'
+
         elif operation_name == 'nwtest_model':
-            template_filename = './nwtest_templates/%s.jinja2' % (operation_name)
+            template_filename =\
+                './nwtest_templates/%s.jinja2' % (operation_name)
             tamplate_param = {'model': self.model}
-            nwtest_filename = './nwtests/' + operation_name + '_' +\
-                            self.hostname +\
-                            '.yml'
+            nwtest_filename =\
+                './nwtests/' +\
+                operation_name + '_' +\
+                self.hostname +\
+                '.yml'
+
         elif operation_name == 'nwtest_interface':
-            template_filename = './nwtest_templates/%s.jinja2' % (operation_name)
+            template_filename =\
+                './nwtest_templates/%s.jinja2' % (operation_name)
             tamplate_param = operation_param
-            nwtest_filename = './nwtests/' + operation_name + '_' +\
-                            operation_param['interface_name'].replace('/', '-') + '_' +\
-                            operation_param['interface_status'] +\
-                            '.yml'
+            nwtest_filename =\
+                './nwtests/' +\
+                operation_name + '_' +\
+                operation_param['interface_name'].replace('/', '-') + '_' +\
+                operation_param['interface_status'] +\
+                '.yml'
+
         elif operation_name == 'nwtest_bgp_neighbor':
-            template_filename = './nwtest_templates/%s.jinja2' % (operation_name)
+            template_filename =\
+                './nwtest_templates/%s.jinja2' % (operation_name)
             tamplate_param = operation_param
-            nwtest_filename = './nwtests/' + operation_name + '_' +\
-                            operation_param['neighbor_address_ipv4'].replace('.', '-') + '_' +\
-                            operation_param['neighbor_status'] +\
-                            '.yml'
+            nwtest_filename =\
+                './nwtests/' +\
+                operation_name + '_' +\
+                operation_param['neighbor_address_ipv4'].replace('.', '-') + '_' +\
+                operation_param['neighbor_status'] +\
+                '.yml'
+
         elif operation_name == 'nwtest_bgp_received_route':
-            template_filename = './nwtest_templates/%s.jinja2' % (operation_name)
+            template_filename =\
+                './nwtest_templates/%s.jinja2' % (operation_name)
             tamplate_param = operation_param
-            nwtest_filename = './nwtests/' + operation_name + '_' +\
-                            operation_param['neighbor_address_ipv4'].replace('.', '-') + '_' +\
-                            operation_param['received_route_address_ipv4'].replace('.', '-') +\
-                            '.yml'
+            nwtest_filename =\
+                './nwtests/' +\
+                operation_name + '_' +\
+                operation_param['neighbor_address_ipv4'].replace('.', '-') + '_' +\
+                operation_param['received_route_address_ipv4'].replace('.', '-') +\
+                '.yml'
+
         elif operation_name == 'nwtest_bgp_advertised_route':
-            template_filename = './nwtest_templates/%s.jinja2' % (operation_name)
+            template_filename =\
+                './nwtest_templates/%s.jinja2' % (operation_name)
             tamplate_param = operation_param
-            nwtest_filename = './nwtests/' + operation_name + '_' +\
-                            operation_param['neighbor_address_ipv4'].replace('.', '-') + '_' +\
-                            operation_param['advertised_route_address_ipv4'].replace('.', '-') +\
-                            '.yml'
+            nwtest_filename =\
+                './nwtests/' +\
+                operation_name + '_' +\
+                operation_param['neighbor_address_ipv4'].replace('.', '-') + '_' +\
+                operation_param['advertised_route_address_ipv4'].replace('.', '-') +\
+                '.yml'
+
         elif operation_name == 'nwtest_ping':
-            template_filename = './nwtest_templates/%s.jinja2' % (operation_name)
+            template_filename =\
+                './nwtest_templates/%s.jinja2' % (operation_name)
             tamplate_param = operation_param
-            nwtest_filename = './nwtests/' + operation_name + '_' +\
-                            operation_param['target_ipaddress'].replace('.', '-') +\
-                            '.yml'
+            nwtest_filename =\
+                './nwtests/' +\
+                operation_name + '_' +\
+                operation_param['target_ipaddress'].replace('.', '-') +\
+                '.yml'
+
         else:
             pass
 
@@ -162,16 +190,22 @@ class Router:
                         operation_param['received_route_subnet_ipv4'])
                     acutual_value =\
                         snapcheck.test_details.values()[0][0]['passed'][0]['pre'].keys()[0]
+
                 elif operation_name == 'nwtest_bgp_advertised_route':
                     expected_value = '%s/%s' % (
                         operation_param['advertised_route_address_ipv4'],
                         operation_param['advertised_route_subnet_ipv4'])
-                    acutual_value = snapcheck.test_details.values()[0][0]['passed'][0]['pre'].keys()[0]
-                else:
-                    expected_value = snapcheck.test_details.values()[0][0]['expected_node_value']
-                    acutual_value = snapcheck.test_details.values()[0][0]['passed'][0]['actual_node_value']
+                    acutual_value =\
+                        snapcheck.test_details.values()[0][0]['passed'][0]['pre'].keys()[0]
 
-                message = 'nwtest file      : %s\n' % nwtest_filename +\
+                else:
+                    expected_value =\
+                        snapcheck.test_details.values()[0][0]['expected_node_value']
+                    acutual_value =\
+                        snapcheck.test_details.values()[0][0]['passed'][0]['actual_node_value']
+
+                message =\
+                    'nwtest file      : %s\n' % nwtest_filename +\
                     'expected value : %s\n' % (expected_value) +\
                     'acutual  value : %s' % (acutual_value)
 
@@ -183,14 +217,18 @@ class Router:
                         operation_param['received_route_address_ipv4'],
                         operation_param['received_route_subnet_ipv4'])
                     acutual_value = 'None'
+
                 elif operation_name == 'nwtest_bgp_advertised_route':
                     expected_value = '%s/%s' % (
                         operation_param['advertised_route_address_ipv4'],
                         operation_param['advertised_route_subnet_ipv4'])
                     acutual_value = 'None'
+
                 else:
-                    expected_value = snapcheck.test_details.values()[0][0]['expected_node_value']
-                    acutual_value = snapcheck.test_details.values()[0][0]['failed'][0]['actual_node_value']
+                    expected_value =\
+                        snapcheck.test_details.values()[0][0]['expected_node_value']
+                    acutual_value =\
+                        snapcheck.test_details.values()[0][0]['failed'][0]['actual_node_value']
 
                 message = 'nwtest file      : %s\n' % nwtest_filename +\
                     'expected value : %s\n' % (expected_value) +\

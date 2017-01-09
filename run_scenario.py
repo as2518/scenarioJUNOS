@@ -13,8 +13,8 @@ import time
 import colorama
 from colorama import Fore, Back, Style
 
-
 from router import Router
+
 
 def main():
     """main function."""
@@ -27,9 +27,9 @@ def main():
                         required=True)
     args = parser.parse_args()
 
-    #Set color font
+    # Set color font
     colorama.init(autoreset=True)
-    
+
     # Read router infomation file
     try:
         with open(args.file, 'r') as f:
@@ -47,24 +47,22 @@ def main():
         sys.stderr.write(str(error))
         sys.exit(1)
 
-
     router1 = Router(
-                hostname    = param['hosts']['hostname'],
-                model       = param['hosts']['model'],
-                ipaddress   = param['hosts']['management_ipaddress'],
-                username    = param['hosts']['username'],
-                password    = param['hosts']['password'])
+        hostname    = param['hosts']['hostname'],
+        model       = param['hosts']['model'],
+        ipaddress   = param['hosts']['management_ipaddress'],
+        username    = param['hosts']['username'],
+        password    = param['hosts']['password'])
 
     print('########## Run Senario : ' + args.file + ' ##########')
 
-    print('operator : %s'       % (param['operator']) )
-    print('operation_date : %d' % (param['operation_date']) )
-    print('hostname : %s'       % (param['hosts']['hostname']) )
-    print('model : %s'          % (param['hosts']['model']) )
+    print('operator : %s'       % (param['operator']))
+    print('operation_date : %d' % (param['operation_date']))
+    print('hostname : %s'       % (param['hosts']['hostname']))
+    print('model : %s'          % (param['hosts']['model']))
     print('purpose :')
     print(param['purpus'])
 
-    
     print('Connect to ' + param['hosts']['hostname'] + ' : ', end='')
     router1.open()
     print(Fore.GREEN + 'OK')
@@ -73,21 +71,20 @@ def main():
     router1.lock()
     print(Fore.GREEN + 'OK')
 
-
     for scenario_param in param['scenario']:
-        if isinstance(scenario_param , dict):
+        if isinstance(scenario_param, dict):
             operation_name  = scenario_param.keys()[0]
             operation_param = scenario_param[operation_name]
         else:
             operation_name = scenario_param
             operation_param = None
-          
-        if "nwtest_" in operation_name:
-            print('Test on < %s > : '%(operation_name), end='')
 
-            result, message = router1.snaptest(operation_name, operation_param) 
-            
-            if result : 
+        if "nwtest_" in operation_name:
+            print('Test on < %s > : ' % (operation_name), end='')
+            result, message =\
+                router1.snaptest(operation_name, operation_param)
+
+            if result:
                 print(Fore.GREEN + 'OK')
                 print(Fore.GREEN + message)
             else:
@@ -95,9 +92,10 @@ def main():
                 print(Fore.RED + message)
 
         elif "set_" in operation_name:
-            print('Load config on < %s > : '%(operation_name), end='')
-            result, message = router1.load_config(operation_name, operation_param)
-            if result : 
+            print('Load config on < %s > : ' % (operation_name), end='')
+            result, message =\
+                router1.load_config(operation_name, operation_param)
+            if result:
                 print(Fore.GREEN + 'OK')
                 print('-'*30)
                 print('Set config: ')
@@ -134,7 +132,7 @@ def main():
                     print(Fore.GREEN + 'OK')
                 else:
                     print(Fore.RED + 'NG')
-            
+
         elif operation_name == 'sleep_10sec':
             print('sleep 10 sec : ', end='')
             time.sleep(10)
@@ -142,7 +140,7 @@ def main():
 
         else:
             print('Cannnot run operation : ' + operation_name)
- 
+
     print('Unlock configure mode : ', end='')
     router1.unlock()
     print(Fore.GREEN + 'OK')
@@ -152,7 +150,6 @@ def main():
     print(Fore.GREEN + 'OK')
 
     print('########## End Senario : ' + args.file + ' ##########')
-
 
 if __name__ == '__main__':
     main()
